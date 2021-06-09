@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    def app_data = null
+    stages {
+        stage('Checkout') {
+            def scm_data = checkout scm
+            app_data = get_app_data(scm_data)
+            currentBuild.displayName = app_data.gitCommitHash
+        }
+
+        stage('Set version') {
+            currentBuild.displayName = app_data.nextFinalVersion
+            set_version(app_data)
+        }
+
+        stage('Build') {
+            build()
+        }
+
+        stage('Static Code Analysis') {
+            parallel "Kiuwan": {
+                if (should_execute_kiuwan(app_data.name)) {
+                    kiuwan("KIUWAN_USER", "KIUWAN_PASSWORD", app_data)
+                } else {
+                    log.warn("Skipping Kiuwan analysis")
+                }
+            }, "Sonar": {
+                if (should_execute_sonar(app_data.name)) {
+                    sonar()
+                    wait_for_sonar_qg(app_data.repositoryName)
+                } else {
+                    log.warn("Skipping Sonar analysis")
+                }
+            }
+        }
+
+        stage('Publish') {
+            publish()
+        }
+    }
+}
