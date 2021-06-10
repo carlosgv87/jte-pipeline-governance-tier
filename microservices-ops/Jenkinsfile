@@ -1,0 +1,96 @@
+def app_metadata = [:]
+def country_env_data = null
+def env_data = get_environment_data(isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME)
+def repository_data = null
+
+def pipeline_steps = { app_data ->
+    isPR() ? {
+        stage('Sanity checks') {
+            steps {
+                script {
+                    nexus_sanity_check("PR", "microservice", app_data, repository_data)
+                }
+            }
+        }
+
+        def output = stage('Diff') {
+            steps {
+                script {
+                    diff(country_env_data.k8s_credentials_id,
+                            country_env_data.short_name,
+                            country_env_data.microservice_helm_chart,
+                            country_env_data.helm_global_values,
+                            app_data.name)
+                }
+            }
+        }
+
+        stage('Report') {
+            steps {
+                script {
+                    reportDiff(repository_data, output)
+                }
+            }
+        }
+    } : {
+        stage('Sanity checks') {
+            steps {
+                script {
+                    nexus_sanity_check("DEPLOYMENT", "microservice", app_data, repository_data)
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    deploy_to(country_env_data.k8s_credentials_id,
+                            country_env_data.short_name,
+                            country_env_data.microservice_helm_chart,
+                            country_env_data.helm_global_values,
+                            app_data.name)
+                }
+            }
+        }
+    }
+}
+
+pipeline {
+    agent any
+    stages {
+        stage('Build cause checks') {
+            steps {
+                script {
+                    avoid_branch_indexing()
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                script {
+                    def scm_data = checkout scm
+                    repository_data = get_repository_data(scm_data)
+                }
+            }
+        }
+
+        def country_code = repository_data.country_code
+        log.info("country_code: " + country_code)
+        country_env_data = env_data.country[country_code]
+        log.debug("country_env_data: " + country_env_data)
+        app_metadata = get_app_data(country_env_data)
+        log.debug("app_metadata: " + app_metadata)
+        milestone()
+        lock(resource: "${country_env_data.short_name}-${repository_data.repositoryName}", inversePrecedence: true) {
+            try {
+                pipeline_steps(app_metadata)()
+            } catch (e) {
+                throw e
+            } finally {
+                milestone()
+                notify(country_env_data, app_metadata, tm('${BUILD_FAILURE_ANALYZER, includeTitle=false, includeIndications=false, useHtmlFormat=false}'))
+            }
+        }
+    }
+}
