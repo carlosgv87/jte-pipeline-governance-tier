@@ -80,13 +80,19 @@ pipeline {
             }
         }
 
-        try {
-            pipeline_steps(app_metadata)()
-        } catch (e) {
-            throw e
-        } finally {
-            milestone()
-            notify(country_env_data, app_metadata, tm('${BUILD_FAILURE_ANALYZER, includeTitle=false, includeIndications=false, useHtmlFormat=false}'))
+        stage('EXEC'){
+            steps {
+                script {
+                    try {
+                        pipeline_steps(app_metadata)()
+                    } catch (e) {
+                        throw e
+                    } finally {
+                        milestone()
+                        notify(country_env_data, app_metadata, tm('${BUILD_FAILURE_ANALYZER, includeTitle=false, includeIndications=false, useHtmlFormat=false}'))
+                    }
+                }
+            }
         }
     }
 }
