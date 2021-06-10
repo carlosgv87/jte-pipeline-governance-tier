@@ -10,9 +10,11 @@ pipeline {
         }
         stage('Checkout') {
             steps {
-                def scm_data = checkout scm
-                app_data = get_app_data(scm_data)
-                currentBuild.displayName = app_data.gitCommitHash
+                script {
+                    def scm_data = checkout scm
+                    app_data = get_app_data(scm_data)
+                    currentBuild.displayName = app_data.gitCommitHash
+                }
             }
         }
 
