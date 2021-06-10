@@ -58,14 +58,6 @@ def pipeline_steps = { app_data ->
 pipeline {
     agent any
     stages {
-        stage('Build cause checks') {
-            steps {
-                script {
-                    avoid_branch_indexing()
-                }
-            }
-        }
-
         stage('Checkout') {
             steps {
                 script {
