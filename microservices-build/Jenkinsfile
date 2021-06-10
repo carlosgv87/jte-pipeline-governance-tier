@@ -1,20 +1,12 @@
+def app_data = null
 pipeline {
     agent any
     stages {
-        stage('Initialize variables') {
-            steps {
-                script {
-                    def app_data = null
-                }
-            }
-        }
         stage('Checkout') {
             steps {
-                script {
-                    def scm_data = checkout scm
-                    app_data = get_app_data(scm_data)
-                    currentBuild.displayName = app_data.gitCommitHash
-                }
+                def scm_data = checkout scm
+                app_data = get_app_data(scm_data)
+                currentBuild.displayName = app_data.gitCommitHash
             }
         }
 
