@@ -108,7 +108,7 @@ application_environments {
     }
 }
 
-libraries {
+@merge libraries {
     commons {
         aws_region = "eu-west-1"
         aws_master_account_id = "000000000000"
