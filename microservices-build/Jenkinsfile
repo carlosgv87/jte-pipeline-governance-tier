@@ -1,10 +1,11 @@
 def app_data = null
+def scm_data = null
 pipeline {
     agent any
     stages {
         stage('Checkout') {
             steps {
-                def scm_data = checkout scm
+                scm_data = checkout scm
                 app_data = get_app_data(scm_data)
                 currentBuild.displayName = app_data.gitCommitHash
             }
