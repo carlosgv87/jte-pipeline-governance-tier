@@ -1,7 +1,6 @@
 jte {
     allow_scm_jenkinsfile = false
-    permissive_initialization = true
-    //skip_default_checkout = true
+    skip_default_checkout = true
 }
 
 application_environments {
