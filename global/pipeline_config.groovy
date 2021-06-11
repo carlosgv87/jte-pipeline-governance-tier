@@ -3,7 +3,7 @@ jte {
     //skip_default_checkout = true
 }
 
-application_environments {
+@merge application_environments {
     development {
         country = [
                 es: [
@@ -110,7 +110,7 @@ application_environments {
     }
 }
 
-libraries {
+@merge libraries {
     commons {
         aws_region = "eu-west-1"
         aws_master_account_id = "000000000000"
