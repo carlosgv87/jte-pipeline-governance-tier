@@ -1,5 +1,6 @@
 jte {
     allow_scm_jenkinsfile = false
+    permissive_initialization = false
     //skip_default_checkout = true
 }
 
