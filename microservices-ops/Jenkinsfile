@@ -71,11 +71,11 @@ pipeline {
             steps {
                 script {
                     def country_code = repository_data.country_code
-                    log.info("country_code: " + country_code)
+                    log.info("country_code: ${country_code}")
                     country_env_data = env_data.country[country_code]
-                    log.debug("country_env_data: " + country_env_data)
+                    log.debug("country_env_data: ${country_env_data}")
                     app_metadata = get_app_data(country_env_data)
-                    log.debug("app_metadata: " + app_metadata)
+                    log.debug("app_metadata: ${app_metadata}")
                 }
             }
         }
