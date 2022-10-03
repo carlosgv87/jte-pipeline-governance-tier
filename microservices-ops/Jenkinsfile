@@ -27,26 +27,26 @@ def pipeline_steps = { app_data ->
             //}
         //}
 
-//        stage('Report') {
-//            steps {
+        //stage('Report') {
+            //steps {
                 //script {
                     reportDiff(repository_data, output)
                 //}
-//            }
-//        }
+            //}
+        //}
     } : {
-//        stage('Sanity checks Deploy') {
-//            steps {
+        //stage('Sanity checks Deploy') {
+            //steps {
                 //script {
                     log.debug("[DEPLOY] Sanity checks - START")
                     nexus_sanity_check("DEPLOYMENT", "microservice", app_data, repository_data)
                     log.debug("[DEPLOY] Sanity checks - END")
                 //}
-//            }
-//        }
+            //}
+        //}
 
-//        stage('Deploy') {
-//            steps {
+        //stage('Deploy') {
+            //steps {
                 //script {
                     log.debug("Deploy")
                     deploy_to(country_env_data.k8s_credentials_id,
@@ -55,8 +55,8 @@ def pipeline_steps = { app_data ->
                             country_env_data.helm_global_values,
                             app_data.name)
                 //}
-//            }
-//        }
+            //}
+        //}
     }
 }
 
