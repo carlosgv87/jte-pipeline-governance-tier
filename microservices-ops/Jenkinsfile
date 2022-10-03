@@ -5,7 +5,7 @@ def repository_data = null
 
 def pipeline_steps = { app_data ->
     isPR() ? {
-        stage('Sanity checks') {
+        stage('Sanity checks Diff') {
             steps {
                 script {
                     log.debug("[DIFF] Sanity checks - START")
@@ -35,7 +35,7 @@ def pipeline_steps = { app_data ->
             }
         }
     } : {
-        stage('Sanity checks') {
+        stage('Sanity checks Deploy') {
             steps {
                 script {
                     log.debug("[DEPLOY] Sanity checks - START")
