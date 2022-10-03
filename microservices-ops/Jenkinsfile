@@ -81,7 +81,6 @@ pipeline {
                     log.debug("country_env_data: ${country_env_data}")
                     app_metadata = get_app_data(country_env_data)
                     log.debug("app_metadata: ${app_metadata}")
-                    log.debug("isPR: ${isPR()}")
                 }
             }
         }
