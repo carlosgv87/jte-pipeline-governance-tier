@@ -88,7 +88,7 @@ pipeline {
 
         //stage('EXEC'){
         //    steps {
-        //        script {
+                script {
                     try {
                         pipeline_steps(app_metadata)()
                     } catch (e) {
@@ -98,7 +98,7 @@ pipeline {
                         log.info("NOTIFICATION")
                         //notify(country_env_data, app_metadata, tm('${BUILD_FAILURE_ANALYZER, includeTitle=false, includeIndications=false, useHtmlFormat=false}'))
                     }
-        //        }
+               }
         //    }
         //}
     }
