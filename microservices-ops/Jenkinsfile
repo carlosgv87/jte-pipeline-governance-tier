@@ -7,54 +7,54 @@ def pipeline_steps = { app_data ->
     isPR() ? {
         stage('Sanity checks Diff') {
             steps {
-                script {
+                //script {
                     log.debug("[DIFF] Sanity checks - START")
                     nexus_sanity_check("PR", "microservice", app_data, repository_data)
                     log.debug("[DIFF] Sanity checks - END")
-                }
+                //}
             }
         }
 
         def output = stage('Diff') {
             steps {
-                script {
+                //script {
                     diff(country_env_data.k8s_credentials_id,
                             country_env_data.short_name,
                             country_env_data.microservice_helm_chart,
                             country_env_data.helm_global_values,
                             app_data.name)
-                }
+                //}
             }
         }
 
         stage('Report') {
             steps {
-                script {
+                //script {
                     reportDiff(repository_data, output)
-                }
+                //}
             }
         }
     } : {
         stage('Sanity checks Deploy') {
             steps {
-                script {
+                //script {
                     log.debug("[DEPLOY] Sanity checks - START")
                     nexus_sanity_check("DEPLOYMENT", "microservice", app_data, repository_data)
                     log.debug("[DEPLOY] Sanity checks - END")
-                }
+                //}
             }
         }
 
         stage('Deploy') {
             steps {
-                script {
+                //script {
                     log.debug("Deploy")
                     deploy_to(country_env_data.k8s_credentials_id,
                             country_env_data.short_name,
                             country_env_data.microservice_helm_chart,
                             country_env_data.helm_global_values,
                             app_data.name)
-                }
+                //}
             }
         }
     }
