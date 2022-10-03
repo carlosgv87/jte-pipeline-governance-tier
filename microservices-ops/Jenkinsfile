@@ -8,6 +8,7 @@ def pipeline_steps = { app_data ->
         stage('Sanity checks') {
             steps {
                 script {
+                    log.debug("Sanity checks")
                     nexus_sanity_check("PR", "microservice", app_data, repository_data)
                 }
             }
