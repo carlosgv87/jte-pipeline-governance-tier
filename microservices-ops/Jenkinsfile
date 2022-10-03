@@ -62,7 +62,7 @@ def pipeline_steps = { app_data ->
 
 pipeline {
     agent any
-    stages {
+    //stages {
         stage('Checkout') {
             steps {
                 script {
@@ -86,8 +86,8 @@ pipeline {
             }
         }
 
-        //stage('EXEC'){
-        //    steps {
+        stage('EXEC'){
+            steps {
                 script {
                     try {
                         pipeline_steps(app_metadata)()
@@ -99,7 +99,7 @@ pipeline {
                         //notify(country_env_data, app_metadata, tm('${BUILD_FAILURE_ANALYZER, includeTitle=false, includeIndications=false, useHtmlFormat=false}'))
                     }
                }
-        //    }
-        //}
-    }
+            }
+        }
+    //}
 }
