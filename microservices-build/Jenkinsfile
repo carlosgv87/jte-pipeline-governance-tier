@@ -8,6 +8,11 @@ pipeline {
                 script {
                     scm_data = checkout scm
                     app_data = get_app_data(scm_data)
+                    def kiuwanExcludesPattern = ""
+                    def kiuwanIncludesPattern = "**/src/main/java/**,**/src/main/resources/**,${app_data.name}-app/pom.xml".toString()
+                    app_data.put('kiuwanExcludesPattern', kiuwanExcludesPattern)
+                    app_data.put('kiuwanIncludesPattern', kiuwanIncludesPattern)
+                    log.info("app_data: ${app_data}")
                     currentBuild.displayName = app_data.gitCommitHash
                 }
             }
@@ -36,14 +41,17 @@ pipeline {
                     parallel(
                             "Kiuwan": {
                                 if (should_execute_kiuwan(app_data.name)) {
-                                    kiuwan("KIUWAN_USER", "KIUWAN_PASSWORD", app_data)
+                                    with_kiuwan {
+                                        kiuwan("KIUWAN_USER", "KIUWAN_PASSWORD", app_data.name, app_data.kiuwanExcludesPattern, app_data.kiuwanIncludesPattern)
+                                        check_kiuwan_qg(app_data.name)
+                                    }
                                 } else {
                                     log.warn("Skipping Kiuwan analysis")
                                 }
                             }, "Sonar": {
                         if (should_execute_sonar(app_data.name)) {
                             sonar()
-                            wait_for_sonar_qg(app_data.repositoryName)
+                            wait_for_sonar_qg(app_data.name)
                         } else {
                             log.warn("Skipping Sonar analysis")
                         }

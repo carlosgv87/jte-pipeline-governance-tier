@@ -91,16 +91,17 @@ pipeline {
         stage("Static Code Analysis") {
             steps {
                 script {
-                    parallel("Kiuwan": {
-                        if (should_execute_kiuwan(app_data.name)) {
-                            with_kiuwan {
-                                kiuwan("$KIUWAN_USER", "$KIUWAN_PASSWORD", app_data.name, app_data.kiuwanExcludesPattern, app_data.kiuwanIncludesPattern)
-                                check_kiuwan_qg(app_data.name)
-                            }
-                        } else {
-                            log.warn("Skipping Kiuwan analysis")
-                        }
-                    }, "Sonar": {
+                    parallel(
+                            "Kiuwan": {
+                                if (should_execute_kiuwan(app_data.name)) {
+                                    with_kiuwan {
+                                        kiuwan("KIUWAN_USER", "KIUWAN_PASSWORD", app_data.name, app_data.kiuwanExcludesPattern, app_data.kiuwanIncludesPattern)
+                                        check_kiuwan_qg(app_data.name)
+                                    }
+                                } else {
+                                    log.warn("Skipping Kiuwan analysis")
+                                }
+                            }, "Sonar": {
                         if (should_execute_sonar(app_data.name)) {
                             sonar()
                             wait_for_sonar_qg(app_data.name)
