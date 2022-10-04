@@ -114,8 +114,10 @@ pipeline {
 
         stage("Publish") {
             steps {
-                publish()
-                reports.generateAcceptanceTestsResultsHTMLReportForNPMProjects(app_data.repositoryName, app_data.nextFinalVersion)
+                script {
+                    publish()
+                    reports.generateAcceptanceTestsResultsHTMLReportForNPMProjects(app_data.repositoryName, app_data.nextFinalVersion)
+                }
             }
         }
 
