@@ -1,6 +1,6 @@
+def app_data = null
 pipeline {
     agent any
-    def app_data = null
     stages {
         stage("Build cause checks") {
             steps {
@@ -119,10 +119,10 @@ pipeline {
             }
         }
 
-        if ("repository-tool".equalsIgnoreCase(app_data.name)) {
-            stage("Execution") {
-                steps {
-                    script {
+        stage("Execution") {
+            steps {
+                script {
+                    if ("repository-tool".equalsIgnoreCase(app_data.name)) {
                         repository_tool_execution()
                     }
                 }
