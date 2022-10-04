@@ -1,0 +1,132 @@
+pipeline {
+    agent any
+    def app_data = null
+    stages {
+        stage("Build cause checks") {
+            steps {
+                script {
+                    avoid_branch_indexing()
+                }
+            }
+        }
+
+        stage("Checkout") {
+            steps {
+                script {
+                    def scm_data = checkout scm
+                    app_data = get_app_data(scm_data)
+                    def kiuwanExcludesPattern = ""
+                    def kiuwanIncludesPattern = ""
+                    if (fileExists("pom.xml")) {
+                        kiuwanIncludesPattern = "**/src/main/java/**,**/src/main/resources/**,${app_data.name}-app/pom.xml".toString()
+                    }
+                    app_data.put('kiuwanExcludesPattern', kiuwanExcludesPattern)
+                    app_data.put('kiuwanIncludesPattern', kiuwanIncludesPattern)
+                    log.info("app_data: ${app_data}")
+                }
+            }
+        }
+
+        stage("Install packages") {
+            steps {
+                script {
+                    install_packages()
+                }
+            }
+        }
+
+        stage("Set version") {
+            steps {
+                script {
+                    set_library_version()
+                }
+            }
+        }
+
+        stage("Resolve ranges") {
+            steps {
+                script {
+                    log.info("Skipping this stage temporarily")
+                    //resolve_ranges()
+                }
+            }
+        }
+
+        stage("Install dependencies") {
+            steps {
+                script {
+                    install_dependencies()
+                }
+            }
+        }
+
+        stage("Unit Tests") {
+            steps {
+                script {
+                    unit_tests()
+                }
+            }
+        }
+
+        stage("Build") {
+            steps {
+                script {
+                    build()
+                }
+            }
+        }
+
+        stage("Vulnerabilities scan") {
+            steps {
+                script {
+                    if (fileExists("pom.xml")) {
+                        vulnerabilities_scan("maven")
+                    } else if (fileExists("package.json")) {
+                        vulnerabilities_scan("npm")
+                    }
+                }
+            }
+        }
+
+        stage("Static Code Analysis") {
+            steps {
+                script {
+                    parallel("Kiuwan": {
+                        if (should_execute_kiuwan(app_data.name)) {
+                            with_kiuwan {
+                                kiuwan("$KIUWAN_USER", "$KIUWAN_PASSWORD", app_data.name, app_data.kiuwanExcludesPattern, app_data.kiuwanIncludesPattern)
+                                check_kiuwan_qg(app_data.name)
+                            }
+                        } else {
+                            log.warn("Skipping Kiuwan analysis")
+                        }
+                    }, "Sonar": {
+                        if (should_execute_sonar(app_data.name)) {
+                            sonar()
+                            wait_for_sonar_qg(app_data.name)
+                        } else {
+                            log.warn("Skipping Sonar analysis")
+                        }
+                    })
+                }
+            }
+        }
+
+        stage("Publish") {
+            steps {
+                publish()
+                reports.generateAcceptanceTestsResultsHTMLReportForNPMProjects(app_data.repositoryName, app_data.nextFinalVersion)
+            }
+        }
+
+        if ("repository-tool".equalsIgnoreCase(app_data.name)) {
+            stage("Execution") {
+                steps {
+                    script {
+                        repository_tool_execution()
+                    }
+                }
+            }
+        }
+    }
+}

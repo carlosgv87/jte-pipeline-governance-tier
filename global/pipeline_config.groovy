@@ -118,5 +118,6 @@ application_environments {
         sonar_qg_timeout_in_minutes = 3
     }
     bitbucket
+    jenkins
     office365
 }

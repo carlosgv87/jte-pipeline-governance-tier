@@ -3,7 +3,7 @@ def scm_data = null
 pipeline {
     agent any
     stages {
-        stage('Checkout') {
+        stage("Checkout") {
             steps {
                 script {
                     scm_data = checkout scm
@@ -13,7 +13,7 @@ pipeline {
             }
         }
 
-        stage('Set version') {
+        stage("Set version") {
             steps {
                 script {
                     currentBuild.displayName = app_data.nextFinalVersion
@@ -22,7 +22,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage("Build") {
             steps {
                 script {
                     build()
@@ -30,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Static Code Analysis') {
+        stage("Static Code Analysis") {
             steps {
                 script {
                     parallel(
@@ -53,7 +53,7 @@ pipeline {
             }
         }
 
-        stage('Publish') {
+        stage("Publish") {
             steps {
                 script {
                     publish()
