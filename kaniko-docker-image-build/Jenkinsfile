@@ -1,0 +1,31 @@
+def app_data = null
+pipeline {
+    agent any
+    stages {
+        stage("Build cause checks") {
+            steps {
+                script {
+                    avoid_branch_indexing()
+                }
+            }
+        }
+
+        stage("Checkout") {
+            steps {
+                script {
+                    def scm_data = checkout scm
+                    app_data = get_app_data(scm_data)
+                    log.info("app_data: ${app_data}")
+                }
+            }
+        }
+
+        stage("Build & Push") {
+            steps {
+                script {
+                    kaniko_build_and_push(app_data)
+                }
+            }
+        }
+    }
+}
