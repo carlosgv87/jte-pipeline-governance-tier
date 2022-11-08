@@ -23,7 +23,7 @@ pipeline {
         stage("Build & Push") {
             steps {
                 script {
-                    docker_build_and_push(app_data)
+                    docker_build_and_push_local(app_data)
                 }
             }
         }

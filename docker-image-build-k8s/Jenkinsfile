@@ -11,6 +11,6 @@ pod {
     }
 
     stage("Build & Push") {
-        docker_build_and_push(app_data)
+        docker_build_and_push_k8s(app_data)
     }
 }
