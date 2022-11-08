@@ -1,0 +1,16 @@
+pod {
+    def app_data = null
+    stage("Build cause checks") {
+        avoid_branch_indexing()
+    }
+
+    stage("Checkout") {
+        def scm_data = checkout scm
+        app_data = get_app_data(scm_data)
+        log.info("app_data: ${app_data}")
+    }
+
+    stage("Build & Push") {
+        docker_build_and_push(app_data)
+    }
+}
